@@ -1,66 +1,53 @@
 name: OWASP Dependency Check (Juice Shop)
 
 on:
-  # Execução manual
   workflow_dispatch:
-
-  # Código alterado
   push:
-
-  # Pull Requests
   pull_request:
-
-  # Criação de branches/tags
   create:
-
-  # Deleção de branches/tags
   delete:
-
-  # Releases
   release:
-
-  # Comentários / Issues (opcional)
   issues:
   issue_comment:
-
-  # Execução recorrente (ex: atualizar base de CVEs)
   schedule:
-    - cron: "0 3 * * *"  # todo dia às 03:00 UTC
+    - cron: "0 3 * * *"
 
 jobs:
   dependency-check:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do código
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configurar Java
+      - name: Instalar Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: 17
 
-      - name: Cache Dependency Check DB
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository/org/owasp/dependency-check-data
-          key: dependency-check-${{ runner.os }}
+      - name: Baixar última versão do Dependency Check
+        run: |
+          curl -s https://api.github.com/repos/dependency-check/DependencyCheck/releases/latest \
+          | grep "browser_download_url.*zip" \
+          | cut -d '"' -f 4 \
+          | wget -qi -
 
-      - name: Rodar Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: "Juice-Shop-Fork"
-          path: "."
-          format: "ALL"
-          out: "dependency-check-report"
-          args: >
-            --scan package.json
-            --scan package-lock.json
-            --enableExperimental
+          unzip dependency-check-*.zip
+          mv dependency-check /opt/dependency-check
+
+      - name: Executar scan (Node / Juice Shop)
+        run: |
+          /opt/dependency-check/bin/dependency-check.sh \
+            --project "Juice-Shop-Fork" \
+            --scan package.json \
+            --scan package-lock.json \
+            --format ALL \
+            --out dependency-check-report \
+            --enableExperimental \
             --enableRetired
 
-      - name: Upload do artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
