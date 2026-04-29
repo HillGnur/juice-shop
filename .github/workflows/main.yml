@@ -28,10 +28,7 @@ jobs:
 
       - name: Baixar última versão do Dependency Check
         run: |
-          curl -s https://api.github.com/repos/dependency-check/DependencyCheck/releases/latest \
-          | grep "browser_download_url.*zip" \
-          | cut -d '"' -f 4 \
-          | wget -qi -
+          wget https://github.com/dependency-check/DependencyCheck/releases/download/v12.2.1/dependency-check-12.2.1-release.zip
 
           unzip dependency-check-*.zip
           mv dependency-check /opt/dependency-check
