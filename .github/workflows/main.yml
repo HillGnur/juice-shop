@@ -1,0 +1,67 @@
+name: OWASP Dependency Check (Juice Shop)
+
+on:
+  # Execução manual
+  workflow_dispatch:
+
+  # Código alterado
+  push:
+
+  # Pull Requests
+  pull_request:
+
+  # Criação de branches/tags
+  create:
+
+  # Deleção de branches/tags
+  delete:
+
+  # Releases
+  release:
+
+  # Comentários / Issues (opcional)
+  issues:
+  issue_comment:
+
+  # Execução recorrente (ex: atualizar base de CVEs)
+  schedule:
+    - cron: "0 3 * * *"  # todo dia às 03:00 UTC
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache Dependency Check DB
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/owasp/dependency-check-data
+          key: dependency-check-${{ runner.os }}
+
+      - name: Rodar Dependency Check
+        uses: jeremylong/DependencyCheck_Action@latest
+        with:
+          project: "Juice-Shop-Fork"
+          path: "."
+          format: "ALL"
+          out: "dependency-check-report"
+          args: >
+            --scan package.json
+            --scan package-lock.json
+            --enableExperimental
+            --enableRetired
+
+      - name: Upload do artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: dependency-check-report
