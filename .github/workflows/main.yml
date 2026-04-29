@@ -48,7 +48,7 @@ jobs:
           key: dependency-check-${{ runner.os }}
 
       - name: Rodar Dependency Check
-        uses: dependency-check/DependencyCheck@latest
+        uses: dependency-check/DependencyCheck@12.2.1
         with:
           project: "Juice-Shop-Fork"
           path: "."
