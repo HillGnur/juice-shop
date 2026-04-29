@@ -1,9 +1,27 @@
 name: OWASP Dependency Check (Juice Shop)
 
 on:
+  workflow_dispatch:
+
+  # Código alterado
   push:
-    branches: [ "main", "develop" ]
+
+  # Pull Requests
   pull_request:
+
+  # Criação de branches/tags
+  create:
+
+  # Deleção de branches/tags
+  delete:
+
+  # Releases
+  release:
+
+  # Comentários / Issues (opcional)
+  issues:
+  issue_comment:
+
 
 jobs:
   dependency-check:
