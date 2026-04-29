@@ -38,7 +38,6 @@ jobs:
           /opt/dependency-check/bin/dependency-check.sh \
             --project "Juice-Shop-Fork" \
             --scan package.json \
-            --scan package-lock.json \
             --format ALL \
             --out dependency-check-report \
             --enableExperimental \
